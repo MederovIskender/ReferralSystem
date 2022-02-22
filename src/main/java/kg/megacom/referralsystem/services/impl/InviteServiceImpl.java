@@ -3,6 +3,7 @@ package kg.megacom.referralsystem.services.impl;
 import kg.megacom.referralsystem.dao.InviteRepo;
 import kg.megacom.referralsystem.enums.InviteStatus;
 import kg.megacom.referralsystem.mappers.InviteMapper;
+import kg.megacom.referralsystem.mappers.SubscriberMapper;
 import kg.megacom.referralsystem.models.dtos.InviteEntityDto;
 import kg.megacom.referralsystem.models.dtos.InviteRequestDto;
 import kg.megacom.referralsystem.models.dtos.SubscriberEntityDto;
@@ -11,12 +12,14 @@ import kg.megacom.referralsystem.services.InviteService;
 import kg.megacom.referralsystem.services.SubscriberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 
+@Service
 public class InviteServiceImpl implements InviteService {
     private InviteRepo inviteRepo;
     private SubscriberService subscriberService;
@@ -36,16 +39,16 @@ public class InviteServiceImpl implements InviteService {
         if (Objects.isNull(receiver)){
             receiver = subscriberService.createSubscriber(inviteRequestDto.getReceiverPhone());
         }
-        Invite invite = InviteMapper.INSTANCE.InviteRequestDtoToInvite(inviteRequestDto);
-        invite.setStartDate(convertToDateViaInstant(LocalDate.now()));
-        invite.setEndDate(convertToDateViaInstant(LocalDate.now().plusDays(1)));
+        Invite invite = InviteMapper.INSTANCE.inviteRequestDtoToInvite(inviteRequestDto);
+        invite.setSender(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(sender));
+        invite.setReceiver(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(receiver));
         invite.setInviteStatus(InviteStatus.NEW);
         invite = inviteRepo.save(invite);
         return new ResponseEntity<>("invite sent", HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<?> AcceptInvite(InviteRequestDto inviteRequestDto) {
+    public ResponseEntity<?> acceptInvite(InviteRequestDto inviteRequestDto) {
         findSubscriber(inviteRequestDto);
         String senderPhone = inviteRequestDto.getSenderPhone();
         String receiverPhone = inviteRequestDto.getReceiverPhone();

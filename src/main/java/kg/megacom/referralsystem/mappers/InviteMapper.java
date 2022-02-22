@@ -16,7 +16,7 @@ public interface InviteMapper {
             @Mapping(target="sender.phone", source="senderPhone"),
             @Mapping(target="receiver.phone", source="receiverPhone")
     })
-    Invite InviteRequestDtoToInvite(InviteRequestDto inviteRequestDto);
+    Invite inviteRequestDtoToInvite(InviteRequestDto inviteRequestDto);
 
     @Mappings({
             @Mapping(target="senderPhone", source="sender.phone"),
