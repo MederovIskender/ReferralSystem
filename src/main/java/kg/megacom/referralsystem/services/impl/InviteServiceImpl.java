@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
@@ -39,7 +40,21 @@ public class InviteServiceImpl implements InviteService {
         if (Objects.isNull(receiver)){
             receiver = subscriberService.createSubscriber(inviteRequestDto.getReceiverPhone());
         }
-        Invite invite = InviteMapper.INSTANCE.inviteRequestDtoToInvite(inviteRequestDto);
+
+        LocalDateTime initialTime = inviteRepo.getFirstTime(sender.getId());
+        LocalDateTime endTimeThirtyDays= initialTime.plusDays(30);
+        int countOfInvitesPerMonth = inviteRepo.getCountOfInvitesPerMonth(sender.getId(), initialTime, endTimeThirtyDays);
+        if (countOfInvitesPerMonth>=30){
+            return new ResponseEntity<>("limit of 30 invites per month is reached", HttpStatus.CONFLICT)
+        }
+        LocalDateTime endOfTheDay = initialTime.plusDays(1);
+        int countPerDay=inviteRepo.geCountPerDay(sender.getId(),initialTime,endOfTheDay);
+        if (countPerDay>=5){
+            return new ResponseEntity<>("limit of 5 invites per day is reached", HttpStatus.CONFLICT)
+        }
+
+
+        Invite invite = new Invite();
         invite.setSender(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(sender));
         invite.setReceiver(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(receiver));
         invite.setInviteStatus(InviteStatus.NEW);
@@ -71,17 +86,6 @@ public class InviteServiceImpl implements InviteService {
         return new ResponseEntity<>("Invite from subscriber " + senderPhone+ " is accepted", HttpStatus.ACCEPTED);
     }
 
-
-    private Date convertToDateViaInstant(LocalDate dateToConvert) {
-        return java.util.Date.from(dateToConvert.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-    public LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-    }
     private ResponseEntity<?> findSubscriber(InviteRequestDto inviteRequestDto){
         SubscriberEntityDto receiver1 = subscriberService.findByPhone(inviteRequestDto.getReceiverPhone());
         if (Objects.isNull(receiver1)){

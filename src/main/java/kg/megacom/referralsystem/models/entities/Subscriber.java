@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -24,7 +25,7 @@ public class Subscriber {
     boolean active;
 
     @CreationTimestamp
-    Date addDate;
+    LocalDateTime addDate;
     @UpdateTimestamp
-    Date editDate;
+    LocalDateTime editDate;
 }

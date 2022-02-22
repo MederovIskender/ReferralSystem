@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -27,8 +28,8 @@ public class Invite {
     Subscriber receiver;
 
     @CreationTimestamp
-    Date startDate;
-    Date endDate;
+    LocalDateTime startDate;
+    LocalDateTime endDate;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
