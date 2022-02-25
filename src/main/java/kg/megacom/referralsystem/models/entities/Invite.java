@@ -1,16 +1,21 @@
 package kg.megacom.referralsystem.models.entities;
 
 import kg.megacom.referralsystem.enums.InviteStatus;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Data
+
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "Invite")
@@ -34,6 +39,5 @@ public class Invite {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     InviteStatus inviteStatus;
-
 
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
@@ -41,18 +42,19 @@ public class InviteServiceImpl implements InviteService {
         if (Objects.isNull(receiver)){
             receiver = subscriberService.createSubscriber(inviteRequestDto.getReceiverPhone());
         }
-        int countOfInvitesPerMonth = inviteRepo.getCountOfInvitesPerMonth(sender.getId(),)
+        Invite invite = new Invite();
+        inviteRepo.save(invite);
+        Date startOfMonth = convertToDateViaInstant(invite.getStartDate());
+        Integer countOfInvitesPerMonth = inviteRepo.getCountOfInvitesPerMonth(sender.getId(), startOfMonth);
         if (countOfInvitesPerMonth>=30){
-
             return new ResponseEntity<>("limit of 30 invites per month is reached", HttpStatus.CONFLICT);
         }
-
-        int countPerDay=inviteRepo.geCountPerDay(sender.getId(),);
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+        Integer countPerDay=inviteRepo.geCountPerDay(sender.getId(), startOfDay, endOfDay);
         if (countPerDay>=5){
             return new ResponseEntity<>("limit of 5 invites per day is reached", HttpStatus.CONFLICT);
         }
-
-        Invite invite = new Invite();
         invite.setSender(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(sender));
         invite.setReceiver(SubscriberMapper.INSTANCE.EntityDtoToSubscriber(receiver));
         invite.setInviteStatus(InviteStatus.NEW);
@@ -79,6 +81,11 @@ public class InviteServiceImpl implements InviteService {
             return new ResponseEntity<>("receiver not found", HttpStatus.NOT_FOUND);
         }
         return null;
+    }
+    Date convertToDateViaInstant(LocalDateTime dateToConvert) {
+        return java.util.Date
+                .from(dateToConvert.atZone(ZoneId.systemDefault())
+                        .toInstant());
     }
 
 }
