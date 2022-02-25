@@ -23,8 +23,4 @@ public class InviteController {
     public ResponseEntity<?> acceptInvite(@RequestBody InviteRequestDto inviteRequestDto){
         return inviteService.acceptInvite(inviteRequestDto);
     }
-    @PutMapping("/reject")
-    public ResponseEntity<?>rejectInvite(@RequestBody InviteRequestDto inviteRequestDto) {
-        return inviteService.rejectInvite(inviteRequestDto);
-    }
 }

@@ -7,7 +7,5 @@ import org.springframework.http.ResponseEntity;
 public interface InviteService {
     ResponseEntity<?> sendInvite(InviteRequestDto inviteSendDto);
 
-    ResponseEntity<?> acceptInvite(InviteRequestDto inviteRequestDto);
-
-    ResponseEntity<?> rejectInvite(InviteRequestDto inviteRequestDto);
+    ResponseEntity<?> acceptInvite(InviteRequestDto inviteRequestDto);;
 }
